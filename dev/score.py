@@ -152,6 +152,7 @@ def score_run(run: str) -> dict:
     out_dir = harness.ROOT / "dev" / "out" / run
     results = {
         p.stem: json.loads(p.read_text()) for p in sorted(out_dir.glob("USGS-*.json"))
+        if not p.name.endswith(".debug.json")
     }
     a_values, baseline6, met_hits, notest_hits = [], [], [], []
     c_judgements: list[tuple[str, str, int, str]] = []

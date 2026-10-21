@@ -17,6 +17,8 @@ from typing import Any
 from participant_module import pipeline
 from participant_module import result as contract
 from participant_module.criteria import Profile, build_profiles, load_assets
+from participant_module.decide import load_trl_model
+from participant_module.models import Models
 from participant_module.safety import Budget, fallback_result, load_prior
 
 
@@ -29,6 +31,8 @@ class AssessmentModule:
         self._asset_root = Path(".")
         self._prior: dict[str, Any] | None = None
         self._profiles: list[Profile] = []
+        self._models: Models | None = None
+        self._trl_model: dict[str, Any] | None = None
         self._seed = 42
 
     def load(self, config: Mapping[str, Any], asset_root: Path) -> None:
@@ -48,6 +52,8 @@ class AssessmentModule:
         self._seed = seed if isinstance(seed, int) else 42
         self._prior = load_prior(self._asset_root)
         self._profiles = build_profiles(self._criteria, load_assets(self._asset_root))
+        self._models = Models(self._asset_root, threads=4, seed=self._seed)
+        self._trl_model = load_trl_model(self._asset_root)
 
     def assess(self, case: Mapping[str, Any], context: Any) -> dict[str, Any]:
         budget = Budget(context)
@@ -63,7 +69,8 @@ class AssessmentModule:
 
     def _assess(self, case: Mapping[str, Any], budget: Budget, context: Any) -> dict[str, Any]:
         return pipeline.run(
-            case, self._profiles, self._checklist_version, self._prior, self._settings, budget
+            case, self._profiles, self._checklist_version, self._prior, self._settings, budget,
+            self._models, self._trl_model,
         )
 
     def reset_case(self) -> None:

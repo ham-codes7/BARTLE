@@ -30,8 +30,8 @@ import harness  # noqa: E402
 DEADLINE_MS = 180_000.0
 
 
-def run_one(args: tuple[str, str, int, float]) -> dict:
-    case_id, out_dir, threads, deadline_ms = args
+def run_one(args: tuple[str, str, int, float, dict]) -> dict:
+    case_id, out_dir, threads, deadline_ms, settings = args
     for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
         os.environ[var] = str(threads)
     started = time.monotonic()
@@ -44,7 +44,7 @@ def run_one(args: tuple[str, str, int, float]) -> dict:
             from participant_module.adapter import AssessmentModule
 
             module = AssessmentModule()
-            module.load(harness.module_config(), harness.SUBMISSION / "assets")
+            module.load(harness.module_config(settings=settings), harness.SUBMISSION / "assets")
             t1 = time.monotonic()
             context = SimpleNamespace(
                 run_id="local",
@@ -59,6 +59,9 @@ def run_one(args: tuple[str, str, int, float]) -> dict:
             module.close()
             issues = harness.validate(result, case)
         Path(out_dir, f"{case_id}.json").write_text(json.dumps(result, indent=2) + "\n")
+        from participant_module import pipeline
+
+        Path(out_dir, f"{case_id}.debug.json").write_text(json.dumps(pipeline.LAST, indent=2) + "\n")
         record.update(
             status=result.get("assessment_status"),
             predicted_trl=result.get("predicted_trl"),
@@ -83,6 +86,8 @@ def main() -> None:
     parser.add_argument("--threads", type=int, default=4, help="CPU threads per case")
     parser.add_argument("--run", default=time.strftime("run-%Y%m%d-%H%M%S"))
     parser.add_argument("--deadline-ms", type=float, default=DEADLINE_MS)
+    parser.add_argument("--set", action="append", default=[], metavar="KEY=JSON",
+                        help="module setting, e.g. --set nli_k=12")
     args = parser.parse_args()
 
     case_ids = harness.select_cases(args.ids, args.smoke, args.all)
@@ -90,7 +95,8 @@ def main() -> None:
         parser.error("give case IDs, --smoke or --all")
     out_dir = harness.ROOT / "dev" / "out" / args.run
     out_dir.mkdir(parents=True, exist_ok=True)
-    jobs = [(cid, str(out_dir), args.threads, args.deadline_ms) for cid in case_ids]
+    settings = {k: json.loads(v) for k, v in (item.split("=", 1) for item in args.set)}
+    jobs = [(cid, str(out_dir), args.threads, args.deadline_ms, settings) for cid in case_ids]
     ctx = mp.get_context("spawn")
     records = []
     with ctx.Pool(processes=max(1, args.jobs), maxtasksperchild=1) as pool:

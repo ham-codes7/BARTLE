@@ -13,9 +13,13 @@ from typing import Any
 from participant_module import evidence as ev
 from participant_module import pdf_text, structure
 from participant_module.criteria import Profile
-from participant_module.decide import MISSING_TEXT, criterion_status, decide_trl
+from participant_module.decide import (
+    MISSING_TEXT, case_features, criterion_status, decide_trl, decide_trl_model,
+)
 from participant_module.result import COMPLETED, INSUFFICIENT, MET, NOT_MET
-from participant_module.retrieve import Candidate, Retriever
+from participant_module.models import Models
+from participant_module.retrieve import Candidate, Retriever, eligible, sentence_quality
+from participant_module.semantic import Semantic, StageLog, fuse
 from participant_module.safety import Budget, abstained_result, prior_for
 from participant_module.target import build_target
 
@@ -24,7 +28,16 @@ DEFAULTS = {
     "theme_threshold": 0.45,  # strength needed to claim a non-ladder criterion met
     "evidence_floor": 0.30,  # a candidate weaker than this is not evidence
     "ocr_min_ms": 60_000,  # OCR only while this much usable time is left
+    "semantic": True,  # embeddings, reranker and NLI stages
+    "pool_lexical": 30,
+    "pool_semantic": 25,
+    "rerank_k": 0,  # reranker off: no gain on weak gold pages (dev/tune_fusion.py)
+    "nli_k": 0,  # NLI off: no gain for ranking or for the TRL model (dev/train_trl.py)
 }
+
+
+# Debug information of the last case (read by the development harness only).
+LAST: dict[str, Any] = {}
 
 
 @dataclass
@@ -42,6 +55,7 @@ def strength_of(candidates: Sequence[Candidate]) -> float:
 def run(
     case: Mapping[str, Any], profiles: Sequence[Profile], checklist_version: str,
     prior: Mapping[str, Any] | None, settings: Mapping[str, Any], budget: Budget,
+    models: Models | None = None, trl_model: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     params = {**DEFAULTS, **{k: v for k, v in settings.items() if k in DEFAULTS}}
     criterion_ids = [p.criterion_id for p in profiles]
@@ -57,21 +71,47 @@ def run(
 
     target = build_target(case)
     retriever = Retriever(sentences, target)
+    log = StageLog()
+    semantic = Semantic(models, budget, log) if models is not None else None
+    if semantic is not None and params["semantic"]:
+        semantic.embed_sentences([x for x in sentences if eligible(x)])
     outcomes: dict[str, CriterionOutcome] = {}
     for profile in profiles:
-        candidates = retriever.candidates(profile)
+        everything = retriever.candidates(profile, top_k=None)
+        pool = everything[: int(params["pool_lexical"])]
+        if semantic is not None and params["semantic"]:
+            pool = semantic.widen(profile, pool, everything, int(params["pool_semantic"]))
+            semantic.rerank(profile, pool, int(params["rerank_k"]))
+            semantic.verify(profile, pool, target.description or target.title, int(params["nli_k"]))
+            for c in pool:
+                c.score = fuse(c, profile)
+        pool.sort(key=lambda c: c.score, reverse=True)
         floor = params["evidence_floor"]
-        usable = [c for c in candidates if c.score >= floor and c.negatives == 0]
+        usable = [c for c in pool if c.score >= floor and c.negatives == 0]
         outcomes[profile.criterion_id] = CriterionOutcome(
-            profile, candidates, ev.select(usable), strength_of(usable)
+            profile, pool, ev.select(usable), strength_of(pool)
         )
 
     target_type = target.target_type or None
     dist = prior_for(prior, target_type)
-    strengths = {
-        o.profile.level: o.strength for o in outcomes.values() if o.profile.level is not None
-    }
-    decision = decide_trl(dist, strengths, float(params["beta"]))
+    features = case_features(outcomes.values(), target_type)
+    if trl_model:
+        decision = decide_trl_model(dist, features, trl_model)
+    else:
+        strengths = {
+            o.profile.level: o.strength for o in outcomes.values() if o.profile.level is not None
+        }
+        decision = decide_trl(dist, strengths, float(params["beta"]))
+    LAST.clear()
+    LAST.update(features=features, timings=dict(log.timings), skipped=list(log.skipped),
+                posterior=decision.posterior,
+                pools={o.profile.kind: [
+                    {"doc": c.sentence.document_id, "page": c.sentence.page, "role": c.sentence.role,
+                     "lex": round(c.score_lexical, 4), "bm25": round(c.bm25, 4), "cues": c.cues,
+                     "neg": c.negatives, "target": round(c.target, 3),
+                     "q": round(sentence_quality(c.sentence.text), 2), "rolew": round(c.role, 2),
+                     **{k: round(v, 4) for k, v in c.extra.items()}}
+                    for c in o.candidates[:60]] for o in outcomes.values()})
 
     statuses: dict[str, str] = {}
     evidence: dict[str, list[dict[str, Any]]] = {}
