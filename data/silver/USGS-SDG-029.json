@@ -1,0 +1,130 @@
+{
+  "case_id": "USGS-SDG-029",
+  "labeler": "assistant draft",
+  "mode": "assisted",
+  "reviewed_by": null,
+  "trl_opinion": 7,
+  "criteria": {
+    "APCTT-C01": {
+      "status": "met",
+      "gold_pages": [
+        {
+          "document_id": "D001",
+          "page": 7
+        },
+        {
+          "document_id": "D001",
+          "page": 13
+        }
+      ],
+      "quote": "This MPE product maintains the high spatial and temporal resolution of the NEXRAD precipitation estimates while incorporating the accuracy of ground-based point observations.",
+      "note": "Basis of the multisensor estimates and of the Huff (1990) rainfall distributions used to disaggregate forecasts."
+    },
+    "APCTT-C02": {
+      "status": "met",
+      "gold_pages": [
+        {
+          "document_id": "D001",
+          "page": 7
+        },
+        {
+          "document_id": "D001",
+          "page": 9
+        }
+      ],
+      "quote": "The DuPage County streamflow simulation system uses these quantitative precipitation forecast data to create streamflow predictions for the two simulated drainage basins.",
+      "note": "Application and how the processed data are used."
+    },
+    "APCTT-C03": {
+      "status": "insufficient evidence",
+      "gold_pages": [],
+      "note": "The report documents the processing steps; no analytical results of the pipeline are shown."
+    },
+    "APCTT-C04": {
+      "status": "insufficient evidence",
+      "gold_pages": [],
+      "note": "No laboratory or controlled testing."
+    },
+    "APCTT-C05": {
+      "status": "insufficient evidence",
+      "gold_pages": [],
+      "note": "No validation of the processed precipitation against observations is reported."
+    },
+    "APCTT-C06": {
+      "status": "met",
+      "gold_pages": [
+        {
+          "document_id": "D001",
+          "page": 7
+        }
+      ],
+      "quote": "As part of this effort, the U.S. Geological Survey maintains a database of hourly meteorological and hydrologic data for use in this near real-time streamflow simulation system.",
+      "note": "The pipeline runs for the real county basins inside the simulation system."
+    },
+    "APCTT-C07": {
+      "status": "met",
+      "gold_pages": [
+        {
+          "document_id": "D001",
+          "page": 7
+        },
+        {
+          "document_id": "D001",
+          "page": 13
+        }
+      ],
+      "quote": "The U.S. Geological Survey, in cooperation with DuPage County Stormwater Management Department, is testing a near real-time streamflow simulation system that assists in the management and operation of reservoirs and other flood-control structures in the Salt Creek and West Branch DuPage River drainage basins in DuPage County, Illinois.",
+      "note": "Prototype being tested in the actual operational setting (near-real-time support of reservoir operations)."
+    },
+    "APCTT-C08": {
+      "status": "insufficient evidence",
+      "gold_pages": [],
+      "note": "The system is still being tested; no qualification."
+    },
+    "APCTT-C09": {
+      "status": "insufficient evidence",
+      "gold_pages": [],
+      "note": "No record of successful operation over a period."
+    },
+    "APCTT-C10": {
+      "status": "insufficient evidence",
+      "gold_pages": [],
+      "note": "No measured performance or criteria."
+    },
+    "APCTT-C11": {
+      "status": "met",
+      "gold_pages": [
+        {
+          "document_id": "D001",
+          "page": 7
+        },
+        {
+          "document_id": "D001",
+          "page": 9
+        },
+        {
+          "document_id": "D001",
+          "page": 13
+        }
+      ],
+      "quote": "The NWS QPF file used in the flood-simulation system contains the forecasted 6-hour precipitation totals and are typi-cally available for 72 hours.",
+      "note": "Inputs, grid cells, subbasins and contribution factors are defined."
+    },
+    "APCTT-C12": {
+      "status": "met",
+      "gold_pages": [
+        {
+          "document_id": "D001",
+          "page": 14
+        },
+        {
+          "document_id": "D001",
+          "page": 7
+        }
+      ],
+      "quote": "This report documents the processes used by the U.S. Geological Survey to create basin-mean and subbasin model-input pre-cipitation time-series data using the next generation weather radar-multisensor precipitation estimates product.",
+      "note": "Evidence concerns the processing pipeline itself."
+    }
+  },
+  "notes": "Agrees with the organizer estimate TRL 7, although C03-C05 are not shown in this documentation report: the ladder has gaps."
+}
