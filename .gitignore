@@ -33,3 +33,4 @@ __pycache__/
 config/my.local.json
 data/*.log
 data/silver_auto/
+data/silver/review/
