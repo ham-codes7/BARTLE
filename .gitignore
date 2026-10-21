@@ -28,3 +28,7 @@ dev/out/
 __pycache__/
 *.pyc
 .DS_Store
+
+# machine-specific server config (generate with config/make_config.py)
+config/my.local.json
+data/*.log
