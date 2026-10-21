@@ -74,3 +74,13 @@ def test_page_sentences_skip_headings_tables_and_contents():
     ])
     texts = [s.text for s in pt.page_sentences(page, 0)]
     assert texts == ["The hydraulic model was calibrated to 16 flood events.", "Results matched within 0.5 foot."]
+
+
+def test_title_case_first_line_of_paragraph_is_not_a_heading():
+    lines = ["Abstract", "The New River Gorge National Park and Preserve in",
+             "West Virginia receives more than 1 million visitors each year."]
+    assert pt.join_lines(lines).split("\n") == [
+        "Abstract",
+        "The New River Gorge National Park and Preserve in West Virginia receives more than 1 million visitors each year.",
+    ]
+    assert pt.join_lines(["Hydraulic Model Calibration", "the model was calibrated."]).count("\n") == 0

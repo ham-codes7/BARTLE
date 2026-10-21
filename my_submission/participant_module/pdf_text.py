@@ -161,8 +161,28 @@ def is_heading(line: str) -> bool:
     words = re.findall(r"[A-Za-z][A-Za-z'’\-]*", line)
     if not 1 <= len(words) <= 10 or len(words) < len(line.split()) * 0.6:
         return False
+    if words[-1].lower() in _STOPWORDS:
+        return False  # "... National Park and Preserve in" continues on the next line
     content = [w for w in words if w.lower() not in _STOPWORDS]
     return bool(content) and sum(w[0].isupper() for w in content) / len(content) >= 0.8
+
+
+# Section names that are headings wherever they appear as a line of their own.
+SECTION_NAMES = re.compile(
+    r"^(abstract|introduction|contents|figures|tables|conversion factors|abbreviations|"
+    r"acknowledg(e)?ments|purpose and scope|background|methods?|results|discussion|"
+    r"results and discussion|summary|conclusions?|summary and conclusions?|references( cited)?|"
+    r"literature cited|appendix(es)?|appendices|glossary)$",
+    re.I,
+)
+
+
+_APPENDIX_LINE = re.compile(r"^Appendix(es)?(\s+[0-9A-Z]{1,3}[.:\u2014–-]?)?(\s|$)")
+
+
+def is_section_line(line: str) -> bool:
+    """A section heading by name ('Abstract', 'References Cited', 'Appendix 1. Input files')."""
+    return bool(SECTION_NAMES.match(line)) or (len(line) <= 100 and bool(_APPENDIX_LINE.match(line)))
 
 
 def join_lines(lines: Sequence[str]) -> str:
@@ -172,9 +192,19 @@ def join_lines(lines: Sequence[str]) -> str:
     """
     paragraphs: list[str] = []
     current = ""
-    for line in lines:
-        mid_sentence = bool(current) and not re.search(r"[.!?:][\"”')\]]?$", current)
-        if _DOT_LEADER.search(line) or _is_table_line(line) or (is_heading(line) and not mid_sentence):
+    for position, line in enumerate(lines):
+        following = lines[position + 1] if position + 1 < len(lines) else ""
+        continues = following[:1].islower()  # next line carries on the same sentence
+        mid_sentence = (
+            bool(current)
+            and not re.search(r"[.!?:][\"”')\]]?$", current)
+            and not current.startswith("By ")  # author byline above the abstract
+        )
+        named = bool(SECTION_NAMES.match(line))
+        heading = named or (
+            (is_heading(line) or is_section_line(line)) and not mid_sentence and not continues
+        )
+        if _DOT_LEADER.search(line) or _is_table_line(line) or heading:
             if current:
                 paragraphs.append(current)
                 current = ""
@@ -262,7 +292,8 @@ def page_sentences(page: Page, start_index: int) -> list[Sentence]:
     sentences: list[Sentence] = []
     index = start_index
     for paragraph in page.text.split("\n"):
-        if _DOT_LEADER.search(paragraph) or _is_table_line(paragraph) or is_heading(paragraph):
+        if (_DOT_LEADER.search(paragraph) or _is_table_line(paragraph) or is_heading(paragraph)
+                or is_section_line(paragraph)):
             continue
         for sentence in split_sentences(paragraph):
             for piece in _long_sentence_pieces(sentence):
