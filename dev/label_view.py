@@ -22,6 +22,13 @@ import harness  # noqa: E402
 from participant_module import pdf_text, structure  # noqa: E402
 
 
+BRIEF_CUES = (
+    r"purpose|calibrat|validat|verif|laborator|test(ed|ing)|accura|criteri|requirement|within \\d|"
+    r"real[- ]time|operational|forecast|available (online|at|through)|web|deployed|installed|since \\d|"
+    r"years of|release|approved|accepted|standard|limitation|demonstrat|applied|scenario|based on"
+)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("case_id")
@@ -29,6 +36,8 @@ def main() -> None:
     parser.add_argument("--grep")
     parser.add_argument("--candidates")
     parser.add_argument("--max-chars", type=int, default=4000)
+    parser.add_argument("--brief", action="store_true",
+                        help="abstract and summary pages in full, plus sentences matching the criterion cues")
     args = parser.parse_args()
     case_id = harness.select_cases([args.case_id])[0]
     meta = harness.manifest_case(case_id)
@@ -52,6 +61,14 @@ def main() -> None:
                     pages.append(item["page"])
             print(f"{kind}: {pages[:8]}")
         return
+
+    if args.brief:
+        for page in doc.pages:
+            if page.role in ("abstract", "summary"):
+                print(f"===== page {page.page} [{page.role}] =====")
+                print(page.text[:6000])
+        args.grep = BRIEF_CUES
+        print("\n----- cue matches -----")
 
     if args.grep:
         pattern = re.compile(args.grep, re.I)
