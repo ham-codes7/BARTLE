@@ -1,0 +1,30 @@
+# --- Local-only reference material (never pushed) ---
+# Organizer participant kits and spreadsheet
+apctt-participant-kit-*/
+*.xlsx
+# Planning notes and AI-assistant files
+PLAN.md
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# --- Environments and model store ---
+apctt-env/
+models/
+.venv/
+
+# --- Data: public PDFs, request files, caches ---
+data/pdfs/
+data/requests/
+data/cache/
+
+# --- Server and run artifacts ---
+server_data/
+worker_tmp/
+dev/out/
+*.zip
+
+# --- Python and OS noise ---
+__pycache__/
+*.pyc
+.DS_Store
