@@ -40,6 +40,15 @@ class Profile:
     negative: list[re.Pattern[str]]
     roles: dict[str, float]
     keywords: list[str] = field(default_factory=list)
+    hypotheses: list[str] = field(default_factory=list)
+
+    def hypotheses_for(self, target: str) -> list[str]:
+        """NLI hypotheses with the target named; the description itself as a fallback."""
+        target = " ".join(target.split())[:100] or "assessed technology"
+        out = [h.replace("{target}", target) for h in self.hypotheses]
+        if not out:
+            out = [re.sub(r"\s*\([^)]*\)", "", self.description).split(":")[-1].strip() or self.description]
+        return out
 
 
 def description_keywords(description: str) -> list[str]:
@@ -100,6 +109,7 @@ def build_profiles(criteria: Sequence[Mapping[str, str]], assets: Mapping[str, A
                 negative=_compile(spec.get("negative", [])),
                 roles={str(k): float(v) for k, v in (spec.get("roles") or generic.get("roles") or {}).items()},
                 keywords=description_keywords(description),
+                hypotheses=[h for h in spec.get("hypotheses", []) if isinstance(h, str)],
             )
         )
     return profiles

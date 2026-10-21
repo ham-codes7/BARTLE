@@ -1,6 +1,6 @@
 {
   "version": "bartle-profiles-1",
-  "note": "Team-written domain cues for report-style evidence. Profiles are keyed by criterion KIND (TRL level parsed from the description, or a theme detected from its words), never by criterion ID. Cues are Python regular expressions, matched case-insensitively against single sentences.",
+  "note": "Team-written domain cues for report-style evidence. Profiles are keyed by criterion KIND (TRL level parsed from the description, or a theme detected from its words), never by criterion ID. Cues are Python regular expressions, matched case-insensitively against single sentences. Hypotheses are NLI statements; {target} is replaced by the case's assessment target description.",
   "kinds": {
     "trl1": {
       "queries": [
@@ -17,7 +17,18 @@
         "\\((for example, )?[A-Z][a-z]+( and others| and [A-Z][a-z]+)?, (19|20)\\d\\d"
       ],
       "negative": [],
-      "roles": {"introduction": 1.0, "methods": 0.8, "abstract": 0.6, "body": 0.5, "results": 0.3, "summary": 0.3, "appendix": 0.2}
+      "roles": {
+        "introduction": 1.0,
+        "methods": 0.8,
+        "abstract": 0.6,
+        "body": 0.5,
+        "results": 0.3,
+        "summary": 0.3,
+        "appendix": 0.2
+      },
+      "hypotheses": [
+        "The {target} is based on established scientific or engineering principles."
+      ]
     },
     "trl2": {
       "queries": [
@@ -34,7 +45,18 @@
         "\\bapplication of\\b"
       ],
       "negative": [],
-      "roles": {"abstract": 1.0, "introduction": 1.0, "summary": 0.7, "methods": 0.5, "body": 0.5, "results": 0.3, "appendix": 0.2}
+      "roles": {
+        "abstract": 1.0,
+        "introduction": 1.0,
+        "summary": 0.7,
+        "methods": 0.5,
+        "body": 0.5,
+        "results": 0.3,
+        "appendix": 0.2
+      },
+      "hypotheses": [
+        "The {target} was developed for a practical application."
+      ]
     },
     "trl3": {
       "queries": [
@@ -49,7 +71,18 @@
         "\\bproof of concept\\b"
       ],
       "negative": [],
-      "roles": {"results": 1.0, "methods": 0.6, "abstract": 0.8, "summary": 0.7, "body": 0.5, "introduction": 0.2, "appendix": 0.3}
+      "roles": {
+        "results": 1.0,
+        "methods": 0.6,
+        "abstract": 0.8,
+        "summary": 0.7,
+        "body": 0.5,
+        "introduction": 0.2,
+        "appendix": 0.3
+      },
+      "hypotheses": [
+        "Analytical or simulation results show that the {target} works."
+      ]
     },
     "trl4": {
       "queries": [
@@ -68,7 +101,18 @@
         "\\bquality[- ]control samples?\\b"
       ],
       "negative": [],
-      "roles": {"methods": 1.0, "results": 1.0, "abstract": 0.6, "summary": 0.5, "body": 0.5, "appendix": 0.4, "introduction": 0.2}
+      "roles": {
+        "methods": 1.0,
+        "results": 1.0,
+        "abstract": 0.6,
+        "summary": 0.5,
+        "body": 0.5,
+        "appendix": 0.4,
+        "introduction": 0.2
+      },
+      "hypotheses": [
+        "The {target} was tested under laboratory or controlled conditions."
+      ]
     },
     "trl5": {
       "queries": [
@@ -85,7 +129,18 @@
         "\\bfield (data|measurements?|surveys?|conditions|observations)\\b"
       ],
       "negative": [],
-      "roles": {"results": 1.0, "methods": 0.8, "abstract": 0.9, "summary": 0.8, "body": 0.5, "appendix": 0.4, "introduction": 0.2}
+      "roles": {
+        "results": 1.0,
+        "methods": 0.8,
+        "abstract": 0.9,
+        "summary": 0.8,
+        "body": 0.5,
+        "appendix": 0.4,
+        "introduction": 0.2
+      },
+      "hypotheses": [
+        "The {target} was calibrated or validated against observed field data."
+      ]
     },
     "trl6": {
       "queries": [
@@ -101,7 +156,18 @@
         "\\b(applied|application) (to|in|at) (the )?[A-Z]"
       ],
       "negative": [],
-      "roles": {"abstract": 1.0, "results": 1.0, "summary": 0.9, "methods": 0.6, "body": 0.5, "introduction": 0.4, "appendix": 0.3}
+      "roles": {
+        "abstract": 1.0,
+        "results": 1.0,
+        "summary": 0.9,
+        "methods": 0.6,
+        "body": 0.5,
+        "introduction": 0.4,
+        "appendix": 0.3
+      },
+      "hypotheses": [
+        "The {target} was applied or demonstrated in the real study area."
+      ]
     },
     "trl7": {
       "queries": [
@@ -124,7 +190,18 @@
         "\\bfuture (work|studies|research|efforts)\\b",
         "\\bnot (yet )?(operational|implemented|deployed|validated)\\b"
       ],
-      "roles": {"abstract": 1.0, "summary": 0.9, "results": 0.8, "introduction": 0.7, "methods": 0.6, "body": 0.6, "appendix": 0.3}
+      "roles": {
+        "abstract": 1.0,
+        "summary": 0.9,
+        "results": 0.8,
+        "introduction": 0.7,
+        "methods": 0.6,
+        "body": 0.6,
+        "appendix": 0.3
+      },
+      "hypotheses": [
+        "The {target} is used in actual operations or in real time."
+      ]
     },
     "trl8": {
       "queries": [
@@ -143,7 +220,18 @@
       "negative": [
         "\\b(preliminary|provisional|draft|prototype|experimental|beta)\\b"
       ],
-      "roles": {"results": 1.0, "summary": 0.9, "abstract": 0.9, "methods": 0.6, "body": 0.6, "introduction": 0.4, "appendix": 0.3}
+      "roles": {
+        "results": 1.0,
+        "summary": 0.9,
+        "abstract": 0.9,
+        "methods": 0.6,
+        "body": 0.6,
+        "introduction": 0.4,
+        "appendix": 0.3
+      },
+      "hypotheses": [
+        "The completed {target} was approved or qualified against its requirements."
+      ]
     },
     "trl9": {
       "queries": [
@@ -160,7 +248,18 @@
       "negative": [
         "\\b(will be|planned|proposed|future)\\b"
       ],
-      "roles": {"abstract": 1.0, "introduction": 0.8, "summary": 0.8, "results": 0.7, "methods": 0.5, "body": 0.6, "appendix": 0.3}
+      "roles": {
+        "abstract": 1.0,
+        "introduction": 0.8,
+        "summary": 0.8,
+        "results": 0.7,
+        "methods": 0.5,
+        "body": 0.6,
+        "appendix": 0.3
+      },
+      "hypotheses": [
+        "The {target} has been used successfully in operation for years."
+      ]
     },
     "requirements": {
       "queries": [
@@ -176,7 +275,18 @@
         "\\b(nash[–-]sutcliffe|RMSE|R2|percent (bias|difference|error)|mean (absolute )?(error|difference))\\b"
       ],
       "negative": [],
-      "roles": {"results": 1.0, "methods": 0.7, "abstract": 0.8, "summary": 0.8, "body": 0.5, "appendix": 0.5, "introduction": 0.2}
+      "roles": {
+        "results": 1.0,
+        "methods": 0.7,
+        "abstract": 0.8,
+        "summary": 0.8,
+        "body": 0.5,
+        "appendix": 0.5,
+        "introduction": 0.2
+      },
+      "hypotheses": [
+        "The measured performance of the {target} is compared with stated criteria."
+      ]
     },
     "test_article": {
       "queries": [
@@ -191,7 +301,18 @@
         "\\b(from|between) (january|february|march|april|may|june|july|august|september|october|november|december|water year|(19|20)\\d\\d)"
       ],
       "negative": [],
-      "roles": {"methods": 1.0, "results": 0.8, "abstract": 0.6, "body": 0.6, "introduction": 0.5, "summary": 0.4, "appendix": 0.5}
+      "roles": {
+        "methods": 1.0,
+        "results": 0.8,
+        "abstract": 0.6,
+        "body": 0.6,
+        "introduction": 0.5,
+        "summary": 0.4,
+        "appendix": 0.5
+      },
+      "hypotheses": [
+        "The report describes the conditions under which the {target} was tested."
+      ]
     },
     "target_match": {
       "queries": [
@@ -199,13 +320,33 @@
       ],
       "positive": [],
       "negative": [],
-      "roles": {"abstract": 1.0, "summary": 0.9, "results": 0.8, "methods": 0.7, "introduction": 0.6, "body": 0.6, "appendix": 0.3}
+      "roles": {
+        "abstract": 1.0,
+        "summary": 0.9,
+        "results": 0.8,
+        "methods": 0.7,
+        "introduction": 0.6,
+        "body": 0.6,
+        "appendix": 0.3
+      },
+      "hypotheses": [
+        "This text is about the {target}."
+      ]
     },
     "generic": {
       "queries": [],
       "positive": [],
       "negative": [],
-      "roles": {"abstract": 1.0, "results": 0.9, "summary": 0.9, "methods": 0.7, "introduction": 0.6, "body": 0.6, "appendix": 0.3}
+      "roles": {
+        "abstract": 1.0,
+        "results": 0.9,
+        "summary": 0.9,
+        "methods": 0.7,
+        "introduction": 0.6,
+        "body": 0.6,
+        "appendix": 0.3
+      },
+      "hypotheses": []
     }
   }
 }

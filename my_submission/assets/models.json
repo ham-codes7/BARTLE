@@ -1,0 +1,6 @@
+{
+  "note": "Catalogue models loaded from APCTT_MODEL_STORE as <repo>/<revision>; ids and revisions from contracts/model-catalog.json (apctt-model-catalog-v1).",
+  "embedder": {"catalog_id": "all-minilm-l6-v2", "repo": "sentence-transformers/all-MiniLM-L6-v2", "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41", "max_length": 256},
+  "reranker": {"catalog_id": "ms-marco-minilm-l6-v2", "repo": "cross-encoder/ms-marco-MiniLM-L6-v2", "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a", "max_length": 256},
+  "nli": {"catalog_id": "deberta-v3-base-zeroshot-v2.0-c", "repo": "MoritzLaurer/deberta-v3-base-zeroshot-v2.0-c", "revision": "bddf8c5411c34ac3565e16e04384fd68b2618dda", "max_length": 256}
+}

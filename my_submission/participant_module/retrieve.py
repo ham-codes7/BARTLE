@@ -30,7 +30,8 @@ class Candidate:
     negatives: int = 0
     role: float = 0.0
     target: float = 0.0
-    score: float = 0.0
+    score: float = 0.0  # current fused score (lexical until semantic stages run)
+    score_lexical: float = 0.0
     extra: dict[str, float] = field(default_factory=dict)
 
 
@@ -89,7 +90,8 @@ class Retriever:
     def __post_init__(self) -> None:
         self.index = BM25([stems(s.text) for s in self.sentences])
 
-    def candidates(self, profile: Profile, top_k: int = 40) -> list[Candidate]:
+    def candidates(self, profile: Profile, top_k: int | None = 40) -> list[Candidate]:
+        """Lexically scored candidates, best first (all eligible sentences if top_k is None)."""
         query: list[str] = []
         for q in profile.queries:
             query.extend(stems(q))
@@ -112,10 +114,10 @@ class Retriever:
                 role=profile.roles.get(sentence.role, 0.3),
                 target=self.target.overlap(sentence.text),
             )
-            candidate.score = combine(candidate, profile)
+            candidate.score = candidate.score_lexical = combine(candidate, profile)
             out.append(candidate)
         out.sort(key=lambda c: c.score, reverse=True)
-        return out[:top_k]
+        return out if top_k is None else out[:top_k]
 
 
 def sentence_quality(text: str) -> float:
