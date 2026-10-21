@@ -1,0 +1,49 @@
+{
+  "declaration_version": "apctt-declaration-v1",
+  "team": "bartle",
+  "package_id": "trl-evidence-module",
+  "package_version": "0.1.0",
+  "declared_package_sha256": "12aef42c942976b117791b1a88ab52a92ec939c48f03dc5c424e7d4db6b68364",
+  "team_training": "trained",
+  "training": {
+    "what": "assets/trl_model.json: cumulative logistic regressions P(TRL >= k) for k = 6 and 7 over 23 case-level features (best evidence score and cue count per criterion kind, target type); assets/trl_prior.json: smoothed TRL distribution per target type.",
+    "code": "dev/train_trl.py and dev/build_prior.py in the team repository",
+    "configuration": "scikit-learn LogisticRegression, L2, C = 0.05, standardised features; add-0.5 smoothing for the prior",
+    "data_sources_used": [
+      "APCTT public sample cases"
+    ],
+    "seeds": "deterministic (no random initialisation); module seed 42",
+    "hardware": "Apple M4 laptop, CPU only",
+    "validation": "leave-one-out over the 99 public cases (prior rebuilt without the held-out case): part-A proxy 0.778 prior only, 0.813 prior + evidence"
+  },
+  "data_sources": [
+    {
+      "source": "APCTT public sample cases (contracts/public-cases.json, USGS reports)",
+      "version": "apctt-public-cases-v1 (kit 0.5.0)",
+      "date": "2026-10-21",
+      "role": "development, tuning and validation; training targets of the TRL model and prior",
+      "label_origin": "organizer's estimated TRL per report and its one-sentence rationale; not expert labels",
+      "linked_project": "none",
+      "license": "LicenseRef-Public-Domain",
+      "license_note": "U.S. public domain (USGS); some figures in the reports are third-party (see the manifest's licence_note); no report content is shipped"
+    }
+  ],
+  "inference_assets": {
+    "source_code": "participant_module/",
+    "weights": [
+      "assets/trl_model.json (team-trained coefficients, JSON)"
+    ],
+    "prompts_or_rules": [
+      "assets/criteria_profiles.json (team-written cues, queries and NLI hypotheses keyed by criterion kind)",
+      "assets/trl_prior.json"
+    ],
+    "reference_assets": [
+      "assets/models.json (catalogue model ids and revisions)"
+    ],
+    "dependency_declarations": [
+      "the common base environment (base_id in submission.json)",
+      "catalogue models listed in submission.json models[]"
+    ]
+  },
+  "notes": "No NASA TechPort data and no data outside the public sample cases were used."
+}

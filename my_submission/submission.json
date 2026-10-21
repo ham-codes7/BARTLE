@@ -1,0 +1,25 @@
+{
+  "submission_version": "apctt-submission-v3",
+  "team": "bartle",
+  "package_id": "trl-evidence-module",
+  "package_version": "0.1.0",
+  "base_id": "apctt-base-9e7fe1324bb6",
+  "declared_package_sha256": "12aef42c942976b117791b1a88ab52a92ec939c48f03dc5c424e7d4db6b68364",
+  "license": "MIT",
+  "compute": {
+    "device": "cpu"
+  },
+  "settings": {},
+  "models": [
+    {
+      "catalog_id": "all-minilm-l6-v2"
+    },
+    {
+      "name": "trl-cumulative-logistic",
+      "path": "assets/trl_model.json",
+      "team_trained": true,
+      "license": "MIT",
+      "description": "Coefficients of cumulative logistic regressions P(TRL >= k) over case-level evidence features, trained by the team (dev/train_trl.py) on the organizer's estimated TRLs of the public sample cases. Plain JSON, no pretrained weights."
+    }
+  ]
+}
