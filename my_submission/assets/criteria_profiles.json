@@ -1,0 +1,211 @@
+{
+  "version": "bartle-profiles-1",
+  "note": "Team-written domain cues for report-style evidence. Profiles are keyed by criterion KIND (TRL level parsed from the description, or a theme detected from its words), never by criterion ID. Cues are Python regular expressions, matched case-insensitively against single sentences.",
+  "kinds": {
+    "trl1": {
+      "queries": [
+        "scientific principles theory equations on which the model or method is based",
+        "previous studies literature observations demonstrate the importance"
+      ],
+      "positive": [
+        "\\b(governing|differential) equations?\\b",
+        "\\bconservation of (mass|momentum|energy)\\b",
+        "\\b(is|are) based on\\b",
+        "\\b(theory|theoretical|principles?|physically based|process-based|empirical relation)",
+        "\\bhas been (demonstrated|shown|documented) in (several|many|previous|numerous) studies\\b",
+        "\\bprevious (studies|investigations|work)\\b",
+        "\\((for example, )?[A-Z][a-z]+( and others| and [A-Z][a-z]+)?, (19|20)\\d\\d"
+      ],
+      "negative": [],
+      "roles": {"introduction": 1.0, "methods": 0.8, "abstract": 0.6, "body": 0.5, "results": 0.3, "summary": 0.3, "appendix": 0.2}
+    },
+    "trl2": {
+      "queries": [
+        "purpose of this report practical application of the model intended use",
+        "the tool was developed to help managers and planners"
+      ],
+      "positive": [
+        "\\b(purpose of this (report|study|investigation)|this report (describes|documents|presents))\\b",
+        "\\b(was|were|has been|have been) (developed|designed|created|built|constructed) (to|for)\\b",
+        "\\b(is|are) intended (to|for)\\b",
+        "\\bwill (allow|help|enable|provide)\\b",
+        "\\b(can|could) be used (to|for|by)\\b",
+        "\\b(to help|to assist|to support|to inform) (water|resource|emergency|land|flood|natural|local|state|federal)?\\s*(managers|planners|officials|agencies|decision)",
+        "\\bapplication of\\b"
+      ],
+      "negative": [],
+      "roles": {"abstract": 1.0, "introduction": 1.0, "summary": 0.7, "methods": 0.5, "body": 0.5, "results": 0.3, "appendix": 0.2}
+    },
+    "trl3": {
+      "queries": [
+        "analytical results demonstrate the model simulates the critical function",
+        "simulation results show computed values sensitivity analysis"
+      ],
+      "positive": [
+        "\\b(results|analyses|simulations?) (show|showed|indicate|indicated|demonstrate|demonstrated|suggest)",
+        "\\b(simulated|computed|estimated|modeled|predicted) (values?|streamflows?|water[- ]levels?|discharges?|concentrations?|loads?|temperatures?|peaks?)\\b",
+        "\\bsensitivity analys[ie]s\\b",
+        "\\b(was|were) (able to|capable of) (simulate|reproduce|represent|predict)",
+        "\\bproof of concept\\b"
+      ],
+      "negative": [],
+      "roles": {"results": 1.0, "methods": 0.6, "abstract": 0.8, "summary": 0.7, "body": 0.5, "introduction": 0.2, "appendix": 0.3}
+    },
+    "trl4": {
+      "queries": [
+        "tested in a laboratory flume bench test controlled conditions results",
+        "model verification against test data or analytical solution"
+      ],
+      "positive": [
+        "\\blaborator(y|ies)\\b",
+        "\\bflume\\b",
+        "\\bbench[- ]?(scale|test)",
+        "\\bcontrolled (conditions|experiments?)\\b",
+        "\\banalytical solution\\b",
+        "\\b(verification|verified) (of|against|using|with)\\b",
+        "\\b(was|were) tested\\b",
+        "\\btest (data|cases?|runs?|results)\\b",
+        "\\bquality[- ]control samples?\\b"
+      ],
+      "negative": [],
+      "roles": {"methods": 1.0, "results": 1.0, "abstract": 0.6, "summary": 0.5, "body": 0.5, "appendix": 0.4, "introduction": 0.2}
+    },
+    "trl5": {
+      "queries": [
+        "model calibrated validated against observed measured field data goodness of fit",
+        "simulated compared with observed streamflow water levels Nash-Sutcliffe efficiency"
+      ],
+      "positive": [
+        "\\bcalibrat(ed|ion|ing)\\b",
+        "\\bvalidat(ed|ion|ing)\\b",
+        "\\b(compared|comparison) (with|to|of) (the )?(observed|measured|recorded|field)",
+        "\\b(observed|measured) (streamflow|discharge|water[- ]surface|water levels?|stages?|high-water marks?|data|values|concentrations?|temperatures?)\\b",
+        "\\b(nash[–-]sutcliffe|NSE|R2|R\\^?2|coefficient of determination|root[- ]mean[- ]square|RMSE|percent bias|PBIAS|goodness[- ]of[- ]fit)\\b",
+        "\\bhigh[- ]water marks?\\b",
+        "\\bfield (data|measurements?|surveys?|conditions|observations)\\b"
+      ],
+      "negative": [],
+      "roles": {"results": 1.0, "methods": 0.8, "abstract": 0.9, "summary": 0.8, "body": 0.5, "appendix": 0.4, "introduction": 0.2}
+    },
+    "trl6": {
+      "queries": [
+        "the calibrated model was applied in the study area to produce flood maps estimates scenarios",
+        "representative model demonstrated in the actual river basin environment"
+      ],
+      "positive": [
+        "\\b(model|tool|method|approach|system|maps?) (was|were|has been|have been) (applied|used|implemented|demonstrated|run)\\b",
+        "\\b(was|were) used to (simulate|estimate|produce|generate|create|compute|evaluate|assess|predict|map)\\b",
+        "\\b(flood[- ]inundation )?maps? (were|was) (created|produced|developed|prepared)\\b",
+        "\\b(scenarios?|simulations?) (were|was) (run|evaluated|simulated|developed)\\b",
+        "\\bdemonstrat(ed|ion|es)\\b",
+        "\\b(applied|application) (to|in|at) (the )?[A-Z]"
+      ],
+      "negative": [],
+      "roles": {"abstract": 1.0, "results": 1.0, "summary": 0.9, "methods": 0.6, "body": 0.5, "introduction": 0.4, "appendix": 0.3}
+    },
+    "trl7": {
+      "queries": [
+        "operational use real-time forecasts available to the public web site streamgages",
+        "prototype close to final configuration demonstrated in the actual operational environment"
+      ],
+      "positive": [
+        "\\boperational(ly)?\\b",
+        "\\b(near[- ])?real[- ]time\\b",
+        "\\b(national weather service|NWS|AHPS|advanced hydrologic prediction)\\b",
+        "\\b(forecast(s|ing|ed)?)\\b",
+        "\\b(available|accessed|accessible|served|delivered|published) (online|on the|through|at|via|from)\\b",
+        "\\b(web ?site|web page|web application|mapper|online (tool|application))\\b",
+        "\\b(deployed|installed|in operation|in service|operating)\\b",
+        "\\b(used|relied on|adopted) by (the )?(public|emergency|local|state|federal|managers|officials|agencies|NWS)",
+        "\\bstreamgages?\\b"
+      ],
+      "negative": [
+        "\\b(could|may|might) be (used|applied|implemented)\\b",
+        "\\bfuture (work|studies|research|efforts)\\b",
+        "\\bnot (yet )?(operational|implemented|deployed|validated)\\b"
+      ],
+      "roles": {"abstract": 1.0, "summary": 0.9, "results": 0.8, "introduction": 0.7, "methods": 0.6, "body": 0.6, "appendix": 0.3}
+    },
+    "trl8": {
+      "queries": [
+        "final system completed qualified tested against requirements approved accepted standards",
+        "meets regulatory standards approved by the agency quality assurance review"
+      ],
+      "positive": [
+        "\\b(qualified|qualification|certified|certification|accredited)\\b",
+        "\\b(approved|accepted|adopted) (by|for)\\b",
+        "\\b(meets?|met|satisf(y|ies|ied)|complies|compliance with) (the )?([a-z]+ ){0,3}(standards?|requirements?|specifications?|criteria)\\b",
+        "\\b(FEMA|regulatory (floodway|purposes?|maps?)|flood insurance)\\b",
+        "\\bquality[- ]assurance\\b",
+        "\\b(final|production) (version|system|release|configuration)\\b",
+        "\\b(released|release) (as|of|version)\\b"
+      ],
+      "negative": [
+        "\\b(preliminary|provisional|draft|prototype|experimental|beta)\\b"
+      ],
+      "roles": {"results": 1.0, "summary": 0.9, "abstract": 0.9, "methods": 0.6, "body": 0.6, "introduction": 0.4, "appendix": 0.3}
+    },
+    "trl9": {
+      "queries": [
+        "system used successfully in routine operations for many years since",
+        "long-term operation network operated continuously over a stated period"
+      ],
+      "positive": [
+        "\\b(since|from) (19|20)\\d\\d\\b",
+        "\\b(has|have) been (used|operated|operating|in operation|maintained|collecting|running|monitored)\\b",
+        "\\b(routine(ly)?|ongoing|long[- ]term|continuous(ly)?|decades?|years of (operation|record|data))\\b",
+        "\\b(\\d+|several|many) years\\b",
+        "\\bperiod of record\\b"
+      ],
+      "negative": [
+        "\\b(will be|planned|proposed|future)\\b"
+      ],
+      "roles": {"abstract": 1.0, "introduction": 0.8, "summary": 0.8, "results": 0.7, "methods": 0.5, "body": 0.6, "appendix": 0.3}
+    },
+    "requirements": {
+      "queries": [
+        "measured performance compared with stated requirements acceptance criteria within tolerance",
+        "calibration target accuracy criteria were met within 0.5 foot"
+      ],
+      "positive": [
+        "\\b(criteri(a|on)|requirements?|specifications?|tolerances?|thresholds?|targets?|standards?|acceptable|acceptance)\\b",
+        "\\bwithin (±|plus or minus )?\\d",
+        "\\b(less|more|greater) than \\d",
+        "\\b\\d+(\\.\\d+)? (percent|feet|foot|ft|meters?|cm|inches)\\b",
+        "\\b(met|meets?|satisf(y|ies|ied)|exceed(s|ed)?|achieved)\\b",
+        "\\b(nash[–-]sutcliffe|RMSE|R2|percent (bias|difference|error)|mean (absolute )?(error|difference))\\b"
+      ],
+      "negative": [],
+      "roles": {"results": 1.0, "methods": 0.7, "abstract": 0.8, "summary": 0.8, "body": 0.5, "appendix": 0.5, "introduction": 0.2}
+    },
+    "test_article": {
+      "queries": [
+        "test conditions boundary conditions study reach configuration of the model version tested",
+        "the model was run for the calibration period with the following conditions"
+      ],
+      "positive": [
+        "\\b(boundary|initial|test|flow|hydrologic|steady|unsteady)[- ](conditions?|state)\\b",
+        "\\b(configuration|version \\d|fidelity|prototype|breadboard|production)\\b",
+        "\\b(calibration|validation|simulation|study) (period|reach|area|domain)\\b",
+        "\\b(cross sections?|grid|mesh|model domain|reaches?) (were|was)\\b",
+        "\\b(from|between) (january|february|march|april|may|june|july|august|september|october|november|december|water year|(19|20)\\d\\d)"
+      ],
+      "negative": [],
+      "roles": {"methods": 1.0, "results": 0.8, "abstract": 0.6, "body": 0.6, "introduction": 0.5, "summary": 0.4, "appendix": 0.5}
+    },
+    "target_match": {
+      "queries": [
+        "the assessed technology itself was developed tested and applied"
+      ],
+      "positive": [],
+      "negative": [],
+      "roles": {"abstract": 1.0, "summary": 0.9, "results": 0.8, "methods": 0.7, "introduction": 0.6, "body": 0.6, "appendix": 0.3}
+    },
+    "generic": {
+      "queries": [],
+      "positive": [],
+      "negative": [],
+      "roles": {"abstract": 1.0, "results": 0.9, "summary": 0.9, "methods": 0.7, "introduction": 0.6, "body": 0.6, "appendix": 0.3}
+    }
+  }
+}
