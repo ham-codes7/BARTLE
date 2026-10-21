@@ -14,7 +14,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from participant_module import pipeline
 from participant_module import result as contract
+from participant_module.criteria import Profile, build_profiles, load_assets
 from participant_module.safety import Budget, fallback_result, load_prior
 
 
@@ -26,6 +28,7 @@ class AssessmentModule:
         self._settings: dict[str, Any] = {}
         self._asset_root = Path(".")
         self._prior: dict[str, Any] | None = None
+        self._profiles: list[Profile] = []
         self._seed = 42
 
     def load(self, config: Mapping[str, Any], asset_root: Path) -> None:
@@ -44,6 +47,7 @@ class AssessmentModule:
         seed = compute.get("seed") if isinstance(compute, Mapping) else None
         self._seed = seed if isinstance(seed, int) else 42
         self._prior = load_prior(self._asset_root)
+        self._profiles = build_profiles(self._criteria, load_assets(self._asset_root))
 
     def assess(self, case: Mapping[str, Any], context: Any) -> dict[str, Any]:
         budget = Budget(context)
@@ -58,10 +62,8 @@ class AssessmentModule:
         return contract.finalize(raw, case, self._criterion_ids, self._checklist_version)
 
     def _assess(self, case: Mapping[str, Any], budget: Budget, context: Any) -> dict[str, Any]:
-        # The evidence pipeline is added feature by feature; until then the prior decides.
-        return fallback_result(
-            case, self._criterion_ids, self._checklist_version, self._prior,
-            "the evidence pipeline is not enabled in this build",
+        return pipeline.run(
+            case, self._profiles, self._checklist_version, self._prior, self._settings, budget
         )
 
     def reset_case(self) -> None:
