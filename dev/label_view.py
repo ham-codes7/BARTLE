@@ -23,8 +23,8 @@ from participant_module import pdf_text, structure  # noqa: E402
 
 
 BRIEF_CUES = (
-    r"purpose|calibrat|validat|verif|laborator|test(ed|ing)|accura|criteri|requirement|within \\d|"
-    r"real[- ]time|operational|forecast|available (online|at|through)|web|deployed|installed|since \\d|"
+    r"purpose|calibrat|validat|verif|laborator|test(ed|ing)|accura|criteri|requirement|within \d|"
+    r"real[- ]time|operational|forecast|available (online|at|through)|web|deployed|installed|since \d|"
     r"years of|release|approved|accepted|standard|limitation|demonstrat|applied|scenario|based on"
 )
 
