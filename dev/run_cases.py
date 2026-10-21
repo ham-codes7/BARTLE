@@ -30,8 +30,22 @@ import harness  # noqa: E402
 DEADLINE_MS = 180_000.0
 
 
-def run_one(args: tuple[str, str, int, float, dict]) -> dict:
-    case_id, out_dir, threads, deadline_ms, settings = args
+def _block_network() -> None:
+    """Make every socket connection fail, like the offline evaluation machines."""
+    import socket
+
+    def refuse(*_args, **_kwargs):
+        raise OSError("network disabled for this test run")
+
+    socket.socket.connect = refuse  # type: ignore[method-assign]
+    socket.create_connection = refuse  # type: ignore[assignment]
+    socket.getaddrinfo = refuse  # type: ignore[assignment]
+
+
+def run_one(args: tuple[str, str, int, float, dict, bool]) -> dict:
+    case_id, out_dir, threads, deadline_ms, settings, offline = args
+    if offline:
+        _block_network()
     for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
         os.environ[var] = str(threads)
     started = time.monotonic()
@@ -86,6 +100,7 @@ def main() -> None:
     parser.add_argument("--threads", type=int, default=4, help="CPU threads per case")
     parser.add_argument("--run", default=time.strftime("run-%Y%m%d-%H%M%S"))
     parser.add_argument("--deadline-ms", type=float, default=DEADLINE_MS)
+    parser.add_argument("--offline", action="store_true", help="block all network access in workers")
     parser.add_argument("--set", action="append", default=[], metavar="KEY=JSON",
                         help="module setting, e.g. --set nli_k=12")
     args = parser.parse_args()
@@ -96,7 +111,7 @@ def main() -> None:
     out_dir = harness.ROOT / "dev" / "out" / args.run
     out_dir.mkdir(parents=True, exist_ok=True)
     settings = {k: json.loads(v) for k, v in (item.split("=", 1) for item in args.set)}
-    jobs = [(cid, str(out_dir), args.threads, args.deadline_ms, settings) for cid in case_ids]
+    jobs = [(cid, str(out_dir), args.threads, args.deadline_ms, settings, args.offline) for cid in case_ids]
     ctx = mp.get_context("spawn")
     records = []
     with ctx.Pool(processes=max(1, args.jobs), maxtasksperchild=1) as pool:
