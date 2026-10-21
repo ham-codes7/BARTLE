@@ -5,8 +5,8 @@
   B (criterion evidence, 40%): against our silver labels in data/silver/<case_id>.json, only for
     the cases that have them.
   C (expert review, 15%): automatic stand-in for the experts. Every met claim's first evidence item
-    is checked: is the supporting_span on the cited page (pdfplumber text, a different extractor
-    from the module's) and is it more than a bare TRL assertion? A span not found counts as
+    is checked: is the supporting_span on the cited page (pypdf text, a different extractor from
+    the module's pdfium; pdfplumber is not used because it interleaves two-column layouts) and is it more than a bare TRL assertion? A span not found counts as
     FABRICATED (-1), a missing span or a TRL-only sentence as 0, otherwise SUPPORTS (+1). Whether
     the span really supports the criterion is judged only through silver labels, so C here is an
     upper bound on the real C.
@@ -46,18 +46,23 @@ def normalise(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", text)
 
 
-@lru_cache(maxsize=4096)
-def plumber_page(case_id: str, page: int) -> str:
-    import pdfplumber
+@lru_cache(maxsize=64)
+def _reader(case_id: str):
+    from pypdf import PdfReader
 
-    with pdfplumber.open(harness.PDF_DIR / f"{case_id}.pdf") as pdf:
-        if not 1 <= page <= len(pdf.pages):
-            return ""
-        return pdf.pages[page - 1].extract_text() or ""
+    return PdfReader(harness.PDF_DIR / f"{case_id}.pdf")
+
+
+@lru_cache(maxsize=4096)
+def independent_page(case_id: str, page: int) -> str:
+    reader = _reader(case_id)
+    if not 1 <= page <= len(reader.pages):
+        return ""
+    return reader.pages[page - 1].extract_text() or ""
 
 
 def span_on_page(case_id: str, page: int, span: str) -> bool:
-    page_text = normalise(plumber_page(case_id, page))
+    page_text = normalise(independent_page(case_id, page))
     needle = normalise(span)
     if not needle:
         return False
