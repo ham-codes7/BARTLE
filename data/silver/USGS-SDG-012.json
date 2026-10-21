@@ -1,0 +1,28 @@
+{
+  "case_id": "USGS-SDG-012",
+  "labeler": "assistant draft",
+  "mode": "blind",
+  "reviewed_by": null,
+  "trl_opinion": 3,
+  "criteria": {
+    "APCTT-C01": {"status": "met", "gold_pages": [{"document_id": "D001", "page": 6}, {"document_id": "D001", "page": 8}, {"document_id": "D001", "page": 23}],
+      "quote": "Each hydrologic component used to model the generation of streamflow is represented within PRMS by a process algorithm that is based on a physical law or empirical relation with measured or estimated characteristics (fig. 1).",
+      "note": "Physical basis of the coupled models (PRMS, SNTemp heat transport) with citations; routing equations in the appendix."},
+    "APCTT-C02": {"status": "met", "gold_pages": [{"document_id": "D001", "page": 6}, {"document_id": "D001", "page": 9}],
+      "quote": "P2S will allow scientists and watershed managers to evaluate the effects of historical climate and projected climate change, landscape evolution, and resource management scenarios on watershed hydrology and in-stream water temperature.",
+      "note": "Intended application and design (three-step coupling) of P2S."},
+    "APCTT-C03": {"status": "insufficient evidence", "gold_pages": [], "note": "No simulation or analytical results are shown; the report is a user's manual."},
+    "APCTT-C04": {"status": "insufficient evidence", "gold_pages": [], "note": "No testing of P2S is reported."},
+    "APCTT-C05": {"status": "insufficient evidence", "gold_pages": [], "note": "No calibration or validation of P2S output against observations."},
+    "APCTT-C06": {"status": "insufficient evidence", "gold_pages": [], "note": "No application to a study watershed is described; only generic steps."},
+    "APCTT-C07": {"status": "insufficient evidence", "gold_pages": [], "note": "Software is distributed with example data, but no operational use is reported."},
+    "APCTT-C08": {"status": "insufficient evidence", "gold_pages": [], "note": "Version 1.0 is released for download, but no qualification against requirements."},
+    "APCTT-C09": {"status": "insufficient evidence", "gold_pages": [], "note": "No record of operational use over a period."},
+    "APCTT-C10": {"status": "insufficient evidence", "gold_pages": [], "note": "No measured performance or criteria."},
+    "APCTT-C11": {"status": "insufficient evidence", "gold_pages": [], "note": "Configuration (version 1.0, inputs, modifications to SNTemp) is described, but no test conditions, because nothing was tested."},
+    "APCTT-C12": {"status": "met", "gold_pages": [{"document_id": "D001", "page": 6}, {"document_id": "D001", "page": 9}],
+      "quote": "A software program, called P2S, has been developed which couples the daily stream temperature simulation capabilities of the U.S. Geological Survey Stream Network Temperature model with the watershed hydrology simulation capabilities of the U.S. Geological Survey Precipitation-Runoff Modeling System.",
+      "note": "The report is about P2S itself."}
+  },
+  "notes": "User's manual of P2S v1.0. Organizer estimate is TRL 4; on the checklist alone only C01-C02 are shown for the target, so this labeller's opinion is TRL 3. Labels follow the checklist, not the estimate."
+}
