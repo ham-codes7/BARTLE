@@ -32,3 +32,4 @@ __pycache__/
 # machine-specific server config (generate with config/make_config.py)
 config/my.local.json
 data/*.log
+data/silver_auto/

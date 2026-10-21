@@ -93,6 +93,56 @@ def c_points(case_id: str, item: dict) -> tuple[int, str]:
     return 1, "supports"
 
 
+SILVER_AUTO = harness.ROOT / "data" / "silver_auto"
+
+
+def ladder_ids() -> dict[int, str]:
+    """TRL level -> criterion ID, read from the checklist descriptions ("(TRL k)")."""
+    out = {}
+    for c in harness.checklist()["criteria"]:
+        m = re.search(r"\bTRL\s*([1-9])\b", c["description"])
+        if m:
+            out[int(m.group(1))] = c["criterion_id"]
+    return out
+
+
+def first_pages(items: list, n: int = 3) -> list[tuple[str, int]]:
+    out: list[tuple[str, int]] = []
+    for item in items:
+        key = (item["document_id"], item["page"])
+        if key not in out:
+            out.append(key)
+        if len(out) == n:
+            break
+    return out
+
+
+def auto_silver(results: dict) -> dict:
+    """Weak met-part check: the ladder criterion at the organizer's TRL, gold = rationale pages."""
+    ladder = ladder_ids()
+    said_met = hits = labelled = 0
+    for case_id, result in results.items():
+        path = SILVER_AUTO / f"{case_id}.json"
+        if not path.exists():
+            continue
+        label = json.loads(path.read_text())
+        gold = {(g["document_id"], g["page"]) for g in label["gold_pages"]}
+        cid = ladder.get(label["estimated_trl"])
+        if not gold or not cid:
+            continue
+        labelled += 1
+        if (result.get("criterion_status") or {}).get(cid) == "met":
+            said_met += 1
+            pages = first_pages((result.get("evidence_reference") or {}).get(cid, []))
+            hits += any(p in gold for p in pages)
+    return {
+        "B_auto_cases": labelled,
+        "B_auto_said_met": round(said_met / labelled, 4) if labelled else None,
+        "B_auto_hit": round(hits / labelled, 4) if labelled else None,
+        "B_auto_hit_given_met": round(hits / said_met, 4) if said_met else None,
+    }
+
+
 def load_silver(case_id: str) -> dict | None:
     path = SILVER / f"{case_id}.json"
     return json.loads(path.read_text()) if path.exists() else None
@@ -161,6 +211,7 @@ def score_run(run: str) -> dict:
         "B_cases": sum(1 for cid in results if load_silver(cid)),
         "B_met_part": round(mean(met_hits), 4) if met_hits else None,
         "B_notest_part": round(mean(notest_hits), 4) if notest_hits else None,
+        **auto_silver(results),
         "C_upper_bound": round(c, 4),
         "C_labels": {label: sum(1 for *_, l in c_judgements if l == label)
                      for label in ("supports", "fabricated", "no_span", "trl_only")},
