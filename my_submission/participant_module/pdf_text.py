@@ -280,6 +280,8 @@ def is_prose(text: str) -> bool:
     """Reject map labels, coordinate grids, equations and figure debris; keep running text."""
     if text.count("°") >= 2 or text.count("#") >= 3 or text.count('" "') >= 2:
         return False
+    if re.search(r"[∑∫∂√ˆ•\x7f]|\bEXPLANATION\b", text) or text.lstrip().startswith("["):
+        return False  # equations, figure keys, table notes
     tokens = text.split()
     words = re.findall(r"[A-Za-z]{2,}", text)
     if len(words) < 4 or len(words) < 0.5 * len(tokens):
