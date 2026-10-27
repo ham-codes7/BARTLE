@@ -64,20 +64,39 @@ class Semantic:
         self.matrix = None  # embeddings of eligible sentences
         self.row: dict[int, int] = {}  # sentence.index -> row
 
-    def embed_sentences(self, sentences: Sequence[Sentence]) -> None:
-        """Embed eligible sentences, evidence-dense sections first, capped."""
+    def embed_sentences(self, sentences: Sequence[Sentence], max_seconds: float = 40.0,
+                        chunk: int = 128) -> None:
+        """Embed eligible sentences, evidence-dense sections first, within a time cap.
+
+        Embedding runs in chunks; when the time cap (or the case budget) is reached, the remaining
+        lower-priority sentences are left unembedded and keep their lexical scores only. This keeps
+        the stage safe on a slower or busier machine than the one it was tuned on.
+        """
         if not self.budget.allows(40_000) or not self.models.available("embedder"):
             self.log.skipped.append("embed")
             return
+        import numpy as np
+
         start = time.monotonic()
         priority = {"abstract": 0, "summary": 1, "results": 2, "introduction": 3, "methods": 4, "body": 5}
         chosen = sorted(sentences, key=lambda x: (priority.get(x.role, 6), x.index))[:MAX_EMBED_SENTENCES]
-        matrix = self.models.embed([x.text for x in chosen])
-        if matrix is None:
+        parts = []
+        done = 0
+        for begin in range(0, len(chosen), chunk):
+            elapsed = time.monotonic() - start
+            if begin and (elapsed > max_seconds or not self.budget.allows(30_000)):
+                self.log.skipped.append(f"embed_partial:{done}/{len(chosen)}")
+                break
+            matrix = self.models.embed([x.text for x in chosen[begin : begin + chunk]])
+            if matrix is None:
+                break
+            parts.append(matrix)
+            done += len(matrix)
+        if not parts:
             self.log.skipped.append("embed")
             return
-        self.matrix = matrix
-        self.row = {x.index: i for i, x in enumerate(chosen)}
+        self.matrix = np.concatenate(parts, axis=0)
+        self.row = {x.index: i for i, x in enumerate(chosen[:done])}
         self.log.timings["embed"] = time.monotonic() - start
 
     def widen(self, profile: Profile, pool: list[Candidate], everything: Sequence[Candidate],

@@ -29,6 +29,7 @@ DEFAULTS = {
     "evidence_floor": 0.30,  # a candidate weaker than this is not evidence
     "ocr_min_ms": 60_000,  # OCR only while this much usable time is left
     "semantic": True,  # embeddings, reranker and NLI stages
+    "embed_max_s": 40.0,  # hard cap on embedding time; the rest keeps lexical scores
     "pool_lexical": 30,
     "pool_semantic": 25,
     "rerank_k": 0,  # reranker off: no gain on weak gold pages (dev/tune_fusion.py)
@@ -74,7 +75,7 @@ def run(
     log = StageLog()
     semantic = Semantic(models, budget, log) if models is not None else None
     if semantic is not None and params["semantic"]:
-        semantic.embed_sentences([x for x in sentences if eligible(x)])
+        semantic.embed_sentences([x for x in sentences if eligible(x)], float(params["embed_max_s"]))
     outcomes: dict[str, CriterionOutcome] = {}
     for profile in profiles:
         everything = retriever.candidates(profile, top_k=None)
