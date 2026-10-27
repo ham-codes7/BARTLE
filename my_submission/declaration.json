@@ -3,7 +3,7 @@
   "team": "bartle",
   "package_id": "trl-evidence-module",
   "package_version": "0.1.0",
-  "declared_package_sha256": "12aef42c942976b117791b1a88ab52a92ec939c48f03dc5c424e7d4db6b68364",
+  "declared_package_sha256": "76e64da21074918550ce4c5f72ff52be46d2f4554d3fcce04f8f546a21d38c8d",
   "team_training": "trained",
   "training": {
     "what": "assets/trl_model.json: cumulative logistic regressions P(TRL >= k) for k = 6 and 7 over 23 case-level features (best evidence score and cue count per criterion kind, target type); assets/trl_prior.json: smoothed TRL distribution per target type.",

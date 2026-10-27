@@ -4,7 +4,7 @@
   "package_id": "trl-evidence-module",
   "package_version": "0.1.0",
   "base_id": "apctt-base-9e7fe1324bb6",
-  "declared_package_sha256": "12aef42c942976b117791b1a88ab52a92ec939c48f03dc5c424e7d4db6b68364",
+  "declared_package_sha256": "76e64da21074918550ce4c5f72ff52be46d2f4554d3fcce04f8f546a21d38c8d",
   "license": "MIT",
   "compute": {
     "device": "cpu"
