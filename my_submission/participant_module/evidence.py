@@ -25,18 +25,34 @@ def clip(text: str, limit: int = MAX_SPAN) -> str:
     return text[: cut if cut > limit // 2 else limit]
 
 
+ANCHOR_ROLES = ("abstract", "summary")
+ANCHOR_MIN_RATIO = 0.5  # an anchor sentence must score at least half of the best sentence
+
+
 def select(candidates: Sequence[Candidate], max_pages: int = MAX_PAGES) -> list[Candidate]:
-    """Best candidate per page, for the top `max_pages` pages, in score order."""
-    chosen: list[Candidate] = []
-    pages: set[tuple[str, int]] = set()
-    for candidate in sorted(candidates, key=lambda c: c.score, reverse=True):
+    """Best sentence first; then the best abstract/summary sentence (reports state their key
+    facts there, and assessors cite those pages); then the next best pages. One item per page."""
+    ranked = sorted(candidates, key=lambda c: c.score, reverse=True)
+    if not ranked:
+        return []
+    chosen: list[Candidate] = [ranked[0]]
+    pages = {(ranked[0].sentence.document_id, ranked[0].sentence.page)}
+    if ranked[0].sentence.role not in ANCHOR_ROLES:
+        for candidate in ranked[1:]:
+            key = (candidate.sentence.document_id, candidate.sentence.page)
+            if candidate.sentence.role in ANCHOR_ROLES and key not in pages:
+                if candidate.score >= ANCHOR_MIN_RATIO * ranked[0].score:
+                    chosen.append(candidate)
+                    pages.add(key)
+                break
+    for candidate in ranked[1:]:
+        if len(chosen) >= max_pages:
+            break
         key = (candidate.sentence.document_id, candidate.sentence.page)
         if key in pages:
             continue
         pages.add(key)
         chosen.append(candidate)
-        if len(chosen) >= max_pages:
-            break
     return chosen
 
 
