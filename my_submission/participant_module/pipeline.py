@@ -88,6 +88,9 @@ def run(
         pool.sort(key=lambda c: c.score, reverse=True)
         floor = params["evidence_floor"]
         usable = [c for c in pool if c.score >= floor and c.negatives == 0]
+        if profile.require:
+            # A met claim for this kind needs an explicit statement (for example "laboratory").
+            usable = [c for c in usable if any(p.search(c.sentence.text) for p in profile.require)]
         outcomes[profile.criterion_id] = CriterionOutcome(
             profile, pool, ev.select(usable), strength_of(pool)
         )
@@ -122,9 +125,9 @@ def run(
             continue
         o = outcomes[profile.criterion_id]
         negative_only = bool(o.candidates) and all(c.negatives > 0 for c in o.candidates[:5])
+        threshold = profile.threshold if profile.threshold is not None else float(params["theme_threshold"])
         status = criterion_status(
-            profile, o.strength, bool(o.chosen), decision.trl, float(params["theme_threshold"]),
-            negative_only,
+            profile, o.strength, bool(o.chosen), decision.trl, threshold, negative_only,
         )
         statuses[profile.criterion_id] = status
         evidence[profile.criterion_id] = ev.items(o.chosen) if status == MET else []

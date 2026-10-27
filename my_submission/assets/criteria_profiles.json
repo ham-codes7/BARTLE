@@ -1,6 +1,6 @@
 {
   "version": "bartle-profiles-1",
-  "note": "Team-written domain cues for report-style evidence. Profiles are keyed by criterion KIND (TRL level parsed from the description, or a theme detected from its words), never by criterion ID. Cues are Python regular expressions, matched case-insensitively against single sentences. Hypotheses are NLI statements; {target} is replaced by the case's assessment target description.",
+  "note": "Team-written domain cues for report-style evidence. Profiles are keyed by criterion KIND (TRL level parsed from the description, or a theme detected from its words), never by criterion ID. Cues are Python regular expressions, matched case-insensitively against single sentences. Hypotheses are NLI statements; {target} is replaced by the case's assessment target description. 'require': a met claim needs at least one cited sentence matching one of these patterns (tuned on silver labels). 'threshold': strength needed for a non-ladder criterion (default from settings).",
   "kinds": {
     "trl1": {
       "queries": [
@@ -112,6 +112,17 @@
       },
       "hypotheses": [
         "The {target} was tested under laboratory or controlled conditions."
+      ],
+      "require": [
+        "\\blaborator(y|ies)\\b",
+        "\\bflume\\b",
+        "\\bbench[- ]?(scale|test)",
+        "\\bcontrolled (conditions|experiments?|setting|tests?)\\b",
+        "\\banalytical solutions?\\b",
+        "\\bsynthetic (data|tests?|cases?)\\b",
+        "\\bbenchmark",
+        "\\btest (data ?sets?|cases?|problems?)\\b",
+        "\\btested for compatibility\\b"
       ]
     },
     "trl5": {
@@ -201,6 +212,16 @@
       },
       "hypotheses": [
         "The {target} is used in actual operations or in real time."
+      ],
+      "require": [
+        "\\boperational(ly)?\\b",
+        "\\b(near[- ])?real[- ]time\\b",
+        "\\bin (routine )?use\\b",
+        "\\b(used|relied on|adopted) by (the )?(public|emergency|local|state|federal|managers|officials|agencies|responders|NWS)",
+        "\\b(available|accessed|served|delivered|published) (online|to the public|through|on the|via)\\b",
+        "\\bweb ?(site|page|application|mapper|portal)\\b",
+        "\\bmapper\\b",
+        "\\bdeployed\\b"
       ]
     },
     "trl8": {
@@ -231,6 +252,14 @@
       },
       "hypotheses": [
         "The completed {target} was approved or qualified against its requirements."
+      ],
+      "require": [
+        "\\b(qualified|qualification|certified|certification|accredited)\\b",
+        "\\b(approved|accepted) (by|for)\\b",
+        "\\b(meets?|met|compl(y|ies|iant|iance)|satisf(y|ies|ied))\\b.{0,60}\\b(standards?|requirements?|specifications?)\\b",
+        "\\b(was|were|is) released\\b",
+        "\\bsoftware release\\b",
+        "\\bfinal (version|release|product)\\b"
       ]
     },
     "trl9": {
@@ -259,6 +288,15 @@
       },
       "hypotheses": [
         "The {target} has been used successfully in operation for years."
+      ],
+      "require": [
+        "\\bsince (19|20)\\d\\d\\b",
+        "\\bfor (over |more than |nearly )?\\d+ years\\b",
+        "\\b(\\d+|several|many) years of (operation|use|record|data collection)\\b",
+        "\\b(operated|operating|in operation|monitored|collected) from (january|february|march|april|may|june|july|august|september|october|november|december|(19|20)\\d\\d)",
+        "\\broutine(ly)? (use|operat)",
+        "\\bdeployment of storm-tide sensors\\b",
+        "\\bprevious(ly)? (deployments?|events?)\\b"
       ]
     },
     "requirements": {
@@ -286,6 +324,10 @@
       },
       "hypotheses": [
         "The measured performance of the {target} is compared with stated criteria."
+      ],
+      "require": [
+        "\\b(criteri(a|on)|requirements?|standards?|targets?|objectives?|specifications?|acceptable|threshold|tolerance)\\b.{0,90}\\b(met|meets?|within|exceed(s|ed)?|satisf(y|ies|ied)|compl(y|ies|iant)|pass(ed|es)?|achiev(ed|es))\\b",
+        "\\b(met|meets?|within|exceed(s|ed)?|satisf(y|ies|ied)|compl(y|ies|iant)|pass(ed|es)?|achiev(ed|es))\\b.{0,90}\\b(criteri(a|on)|requirements?|standards?|targets?|objectives?|specifications?|acceptab(le|ility)|threshold|tolerance)\\b"
       ]
     },
     "test_article": {
@@ -312,7 +354,8 @@
       },
       "hypotheses": [
         "The report describes the conditions under which the {target} was tested."
-      ]
+      ],
+      "threshold": 0.0
     },
     "target_match": {
       "queries": [

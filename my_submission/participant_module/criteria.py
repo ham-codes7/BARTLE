@@ -41,6 +41,8 @@ class Profile:
     roles: dict[str, float]
     keywords: list[str] = field(default_factory=list)
     hypotheses: list[str] = field(default_factory=list)
+    require: list[re.Pattern[str]] = field(default_factory=list)
+    threshold: float | None = None
 
     def hypotheses_for(self, target: str) -> list[str]:
         """NLI hypotheses with the target named; the description itself as a fallback."""
@@ -110,6 +112,8 @@ def build_profiles(criteria: Sequence[Mapping[str, str]], assets: Mapping[str, A
                 roles={str(k): float(v) for k, v in (spec.get("roles") or generic.get("roles") or {}).items()},
                 keywords=description_keywords(description),
                 hypotheses=[h for h in spec.get("hypotheses", []) if isinstance(h, str)],
+                require=_compile(spec.get("require", [])),
+                threshold=float(spec["threshold"]) if isinstance(spec.get("threshold"), (int, float)) else None,
             )
         )
     return profiles
