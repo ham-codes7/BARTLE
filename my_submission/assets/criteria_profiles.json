@@ -114,15 +114,18 @@
         "The {target} was tested under laboratory or controlled conditions."
       ],
       "require": [
-        "\\blaborator(y|ies)\\b",
-        "\\bflume\\b",
-        "\\bbench[- ]?(scale|test)",
-        "\\bcontrolled (conditions|experiments?|setting|tests?)\\b",
+        "\\b(tested|tests?|testing|experiments?|experimental|validated|verified|evaluated|trials?)\\b.{0,80}\\b(laborator(y|ies)|controlled (conditions|setting|environment)|bench)\\b",
+        "\\b(laborator(y|ies)|bench[- ]scale|controlled[- ](conditions|setting|environment))\\b.{0,80}\\b(tested|tests?|testing|experiments?|validated|verified|evaluated|trials?)\\b",
+        "\\blaboratory flume\\b|\\bflume (experiments?|tests?|studies)\\b",
         "\\banalytical solutions?\\b",
-        "\\bsynthetic (data|tests?|cases?)\\b",
-        "\\bbenchmark",
-        "\\btest (data ?sets?|cases?|problems?)\\b",
+        "\\bbenchmark (tests?|problems?|cases?|data ?sets?)\\b",
+        "\\bsynthetic (data ?sets?|tests?)\\b",
         "\\btested for compatibility\\b"
+      ],
+      "exclude": [
+        "\\b(analy[sz]ed|analysis|processed|processing|reporting|shipped|sent)\\b.{0,60}\\blaborator",
+        "\\blaborator(y|ies)\\b.{0,40}\\b(analy|reporting|processing)",
+        "\\btest case\\b"
       ]
     },
     "trl5": {

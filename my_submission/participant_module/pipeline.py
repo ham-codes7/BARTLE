@@ -91,6 +91,8 @@ def run(
         if profile.require:
             # A met claim for this kind needs an explicit statement (for example "laboratory").
             usable = [c for c in usable if any(p.search(c.sentence.text) for p in profile.require)]
+        if profile.exclude:
+            usable = [c for c in usable if not any(p.search(c.sentence.text) for p in profile.exclude)]
         outcomes[profile.criterion_id] = CriterionOutcome(
             profile, pool, ev.select(usable), strength_of(pool)
         )

@@ -42,6 +42,7 @@ class Profile:
     keywords: list[str] = field(default_factory=list)
     hypotheses: list[str] = field(default_factory=list)
     require: list[re.Pattern[str]] = field(default_factory=list)
+    exclude: list[re.Pattern[str]] = field(default_factory=list)
     threshold: float | None = None
 
     def hypotheses_for(self, target: str) -> list[str]:
@@ -113,6 +114,7 @@ def build_profiles(criteria: Sequence[Mapping[str, str]], assets: Mapping[str, A
                 keywords=description_keywords(description),
                 hypotheses=[h for h in spec.get("hypotheses", []) if isinstance(h, str)],
                 require=_compile(spec.get("require", [])),
+                exclude=_compile(spec.get("exclude", [])),
                 threshold=float(spec["threshold"]) if isinstance(spec.get("threshold"), (int, float)) else None,
             )
         )
