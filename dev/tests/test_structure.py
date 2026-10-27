@@ -53,3 +53,33 @@ def test_heading_role_mapping():
     assert st.heading_role("Purpose and Scope") == "introduction"
     assert st.heading_role("Summary and Conclusions") == "summary"
     assert st.heading_role("Hydraulic Analyses") is None
+
+
+def _doc(pages_lines):
+    pages = []
+    for number, lines in enumerate(pages_lines, start=1):
+        page = pt.Page("D001", number, "", list(lines))
+        page.text = pt.join_lines(page.lines)
+        pages.append(page)
+    return pt.DocumentText("D001", len(pages), pages)
+
+
+LONG = ("The calibrated model reproduced observed water levels at every gage during the "
+        "calibration period and was then applied to the proposed scenarios. ") * 5
+
+
+def test_numbered_headings_and_carried_over_summary():
+    doc = _doc([
+        ["Report Title", "By A. Author", "Abstract", "A model was built and tested."],
+        ["1. Introduction", "This report describes the model."],
+        ["Summary", LONG],
+        [LONG, "References Cited", "Chow, V.T., 1959, Open-channel hydraulics."],
+        ["References Cited  45", "Smith, J., 2000, Another paper."],
+    ])
+    st.assign_roles(doc)
+    assert [p.role for p in doc.pages] == ["abstract", "introduction", "summary", "summary", "references"]
+
+
+def test_summary_of_section_is_not_the_report_summary():
+    assert st.heading_role("Summary of Water-Quality Data") != "summary"
+    assert st.heading_role("2.1 Summary and Conclusions") == "summary"

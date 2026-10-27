@@ -180,9 +180,18 @@ SECTION_NAMES = re.compile(
 _APPENDIX_LINE = re.compile(r"^Appendix(es)?(\s+[0-9A-Z]{1,3}[.:\u2014–-]?)?(\s|$)")
 
 
+_NUMBERING = re.compile(r"^\d{1,2}(\.\d{1,2}){0,3}\.?\s+(?=[A-Z])")
+
+
+def strip_numbering(line: str) -> str:
+    """'1.2 System Requirements' -> 'System Requirements' (numbered section headings)."""
+    return _NUMBERING.sub("", line, count=1)
+
+
 def is_section_line(line: str) -> bool:
-    """A section heading by name ('Abstract', 'References Cited', 'Appendix 1. Input files')."""
-    return bool(SECTION_NAMES.match(line)) or (len(line) <= 100 and bool(_APPENDIX_LINE.match(line)))
+    """A section heading by name ('Abstract', '1. Introduction', 'Appendix 1. Input files')."""
+    bare = strip_numbering(line)
+    return bool(SECTION_NAMES.match(bare)) or (len(line) <= 100 and bool(_APPENDIX_LINE.match(bare)))
 
 
 def join_lines(lines: Sequence[str]) -> str:

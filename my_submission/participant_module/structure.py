@@ -22,7 +22,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
-from participant_module.pdf_text import _DOT_LEADER, DocumentText, Page, is_heading, is_section_line
+from participant_module.pdf_text import _DOT_LEADER, DocumentText, Page, is_heading, is_section_line, strip_numbering
 
 EVIDENCE_ROLES = ("abstract", "introduction", "methods", "results", "summary", "body", "appendix")
 NON_EVIDENCE_ROLES = ("front_matter", "contents", "references")
@@ -30,7 +30,7 @@ NON_EVIDENCE_ROLES = ("front_matter", "contents", "references")
 _ROLE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("references", re.compile(r"^(references( cited)?|literature cited|selected references|bibliography)$", re.I)),
     ("abstract", re.compile(r"^(abstract|executive summary)$", re.I)),
-    ("summary", re.compile(r"^(summary|conclusions?|summary and conclusions?|concluding remarks)\b", re.I)),
+    ("summary", re.compile(r"^(summary|conclusions?|summary and conclusions?|concluding remarks|discussion and conclusions?)$", re.I)),
     ("appendix", re.compile(r"^(appendix(es)?|appendices|glossary|supplemental (information|data|tables?))\b", re.I)),
     ("introduction", re.compile(
         r"^(introduction|purpose and scope|background|previous (studies|investigations|work)|"
@@ -50,12 +50,19 @@ _FRONT = re.compile(
 )
 
 
+# Running page headers such as "References Cited  45" (title, wide space, page number).
+_RUNNING_HEADER = re.compile(r"(\u2003|\u2002|\s{2,})\d{1,4}$|^\d{1,4}(\u2003|\u2002|\s{2,})")
+
+
 def heading_lines(page: Page) -> list[str]:
-    return [line for line in page.text.split("\n") if is_heading(line) or is_section_line(line)]
+    return [
+        line for line in page.text.split("\n")
+        if (is_heading(line) or is_section_line(line)) and not _RUNNING_HEADER.search(line)
+    ]
 
 
 def heading_role(heading: str) -> str | None:
-    text = heading.strip().rstrip(":")
+    text = strip_numbering(heading.strip().rstrip(":"))
     if _CONTENTS.match(text):
         return "contents"
     if _FRONT.match(text):
@@ -113,6 +120,13 @@ def assign_roles(document: DocumentText) -> None:
                 if re.fullmatch(r"(abstract|executive summary)", heading.strip(), re.I):
                     headings = headings[position + 1 :]
                     break
+        # Substantial text above the first heading belongs to the section carried over from the
+        # previous page (for example the end of the summary above "References Cited").
+        lines = page.text.split("\n")
+        first = next((n for n, line in enumerate(lines) if line in headings), len(lines))
+        carried = sum(len(line) for line in lines[:first]) >= 400
+        if carried and role != "front_matter" and page.page != abstract_at:
+            page_role = role
         for heading in headings:
             found = heading_role(heading)
             if found in ("contents", "front_matter"):
