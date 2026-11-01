@@ -32,7 +32,8 @@ first, each with a supporting span quoted verbatim from that page. It also retur
 
 ## How it was built
 
-Development used the 99 public sample cases and the organizer's estimated TRLs (see
-`declaration.json`). Leave-one-out validation of the TRL model gives a part-A proxy of 0.813,
-against 0.778 for the prior alone. All public cases produce contract-valid results, at about 10 s
-per case on an Apple M4 with 4 threads; the largest report takes 28 s through the kit server.
+Development used the 99 public sample cases, the organizer's estimated TRLs and team-made
+criterion labels for 20 of those cases (see `declaration.json`). Leave-one-out validation of the TRL model gives a part-A proxy of 0.813,
+against 0.778 for the prior alone. All public cases produce contract-valid results, with a median of
+25 s and a maximum of 55 s per case on an Apple M4 (4 threads per case, 3 cases at a time). A
+300-page case in 3 documents took 22 s when run alone.
