@@ -8,7 +8,7 @@
   "training": {
     "what": "assets/trl_model.json: cumulative logistic regressions P(TRL >= k) for k = 6 and 7 over 23 case-level features (best evidence score and cue count per criterion kind, target type); assets/trl_prior.json: smoothed TRL distribution per target type.",
     "code": "dev/train_trl.py and dev/build_prior.py in the team repository",
-    "configuration": "scikit-learn LogisticRegression, L2, C = 0.05, standardised features; add-0.5 smoothing for the prior",
+    "configuration": "scikit-learn LogisticRegression, L2, C = 0.1, standardised features; add-0.5 smoothing for the prior",
     "data_sources_used": [
       "APCTT public sample cases"
     ],
@@ -26,6 +26,15 @@
       "linked_project": "none",
       "license": "LicenseRef-Public-Domain",
       "license_note": "U.S. public domain (USGS); some figures in the reports are third-party (see the manifest's licence_note); no report content is shipped"
+    },
+    {
+      "source": "Team-made criterion labels for 20 of the public sample cases (data/silver/ in the team repository)",
+      "version": "data/silver, 20 cases",
+      "date": "2026-10-21 to 2026-10-21",
+      "role": "development and tuning of evidence rules and retrieval weights, and proxy scoring; not used to train the TRL model or shipped in the package",
+      "label_origin": "per-criterion status and gold pages drafted by the team with an AI assistant from the report text, 5 cases without seeing the pipeline's output; a team member spot-checked 3 cases; not expert labels",
+      "linked_project": "none",
+      "license": "MIT"
     }
   ],
   "inference_assets": {
@@ -45,5 +54,5 @@
       "catalogue models listed in submission.json models[]"
     ]
   },
-  "notes": "No NASA TechPort data and no data outside the public sample cases were used."
+  "notes": "No NASA TechPort data and no data from outside the public sample cases were used; the team-made labels above are derived from those cases."
 }
