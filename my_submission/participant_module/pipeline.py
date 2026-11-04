@@ -34,6 +34,9 @@ DEFAULTS = {
     "pool_semantic": 25,
     "rerank_k": 0,  # reranker off: no gain on weak gold pages (dev/tune_fusion.py)
     "nli_k": 0,  # NLI off: no gain for ranking or for the TRL model (dev/train_trl.py)
+    "fill_floor": 0.2,  # fill free page slots with weaker candidates down to this score
+    "diverse_ratio": 0.6,  # prefer pages from another report section within this share of the best
+    "anchor_ratio": 0.5,  # an abstract/summary sentence needs this share of the best score
 }
 
 
@@ -94,9 +97,11 @@ def run(
             usable = [c for c in usable if any(p.search(c.sentence.text) for p in profile.require)]
         if profile.exclude:
             usable = [c for c in usable if not any(p.search(c.sentence.text) for p in profile.exclude)]
-        outcomes[profile.criterion_id] = CriterionOutcome(
-            profile, pool, ev.select(usable), strength_of(pool)
-        )
+        fill = [c for c in pool if c.negatives == 0 and not (
+            profile.exclude and any(p.search(c.sentence.text) for p in profile.exclude))]
+        chosen = ev.select(usable, fill=fill, fill_floor=params["fill_floor"],
+                           anchor_ratio=float(params["anchor_ratio"]), diverse_ratio=params["diverse_ratio"])
+        outcomes[profile.criterion_id] = CriterionOutcome(profile, pool, chosen, strength_of(pool))
 
     target_type = target.target_type or None
     dist = prior_for(prior, target_type)
