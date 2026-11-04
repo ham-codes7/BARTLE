@@ -120,6 +120,15 @@ class Retriever:
         return out if top_k is None else out[:top_k]
 
 
+# A sentence about another study ("Smith and others (2010) found ...", "Previous studies ..."):
+# it describes someone else's work, not the assessed technology.
+OTHER_STUDY = re.compile(
+    r"^(?:[^,.;]{0,40}?,\s*)?(?:[A-Z][A-Za-z'\-]+(?:\s+(?:and|&)\s+[A-Z][A-Za-z'\-]+)?"
+    r"(?:\s+(?:and others|et al\.?))?\s*\((?:19|20)\d\d[a-z]?(?:,\s*(?:19|20)\d\d[a-z]?)*\)"
+    r"|(?:Previous|Prior|Earlier|Other)\s+(?:studies|investigations|work|research))"
+)
+
+
 def sentence_quality(text: str) -> float:
     """1.0 for a complete, readable sentence; lower for fragments, captions and run-ons."""
     quality = 1.0

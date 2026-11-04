@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Any
 
-from participant_module.retrieve import Candidate
+from participant_module.retrieve import OTHER_STUDY, Candidate
 
 MAX_SPAN = 400
 MAX_PAGES = 3
@@ -25,6 +25,7 @@ def clip(text: str, limit: int = MAX_SPAN) -> str:
     return text[: cut if cut > limit // 2 else limit]
 
 
+OTHER_STUDY_WEIGHT = 0.6  # a sentence about another study is weaker evidence for this target
 ANCHOR_ROLES = ("abstract", "summary")
 ANCHOR_MIN_RATIO = 0.5  # an anchor sentence must score at least half of the best sentence
 
@@ -42,8 +43,13 @@ def select(
 
     Only the first three distinct pages count for page agreement and only the first item is
     checked as a quotation, so free page slots are filled from `fill` (weaker candidates, at
-    least `fill_floor`) once the criterion has real evidence."""
-    ranked = sorted(candidates, key=lambda c: c.score, reverse=True)
+    least `fill_floor`) once the criterion has real evidence. Ordering uses `weight`, which
+    only affects which sentences are shown, never the scores the TRL decision reads."""
+
+    def weight(c: Candidate) -> float:
+        return c.score * (OTHER_STUDY_WEIGHT if OTHER_STUDY.search(c.sentence.text) else 1.0)
+
+    ranked = sorted(candidates, key=weight, reverse=True)
     if not ranked:
         return []
     chosen: list[Candidate] = [ranked[0]]
@@ -52,20 +58,20 @@ def select(
         for candidate in ranked[1:]:
             key = (candidate.sentence.document_id, candidate.sentence.page)
             if candidate.sentence.role in ANCHOR_ROLES and key not in pages:
-                if candidate.score >= anchor_ratio * ranked[0].score:
+                if weight(candidate) >= anchor_ratio * weight(ranked[0]):
                     chosen.append(candidate)
                     pages.add(key)
                 break
     if diverse_ratio is not None:
         # experts tend to cite different parts of a report (abstract, methods, results)
         for candidate in ranked[1:]:
-            if len(chosen) >= max_pages or candidate.score < diverse_ratio * ranked[0].score:
+            if len(chosen) >= max_pages or weight(candidate) < diverse_ratio * weight(ranked[0]):
                 break
             key = (candidate.sentence.document_id, candidate.sentence.page)
             if key not in pages and candidate.sentence.role not in {c.sentence.role for c in chosen}:
                 pages.add(key)
                 chosen.append(candidate)
-    extra = sorted(fill, key=lambda c: c.score, reverse=True) if fill_floor is not None else []
+    extra = sorted(fill, key=weight, reverse=True) if fill_floor is not None else []
     for candidate in [*ranked[1:], *(c for c in extra if c.score >= fill_floor)]:
         if len(chosen) >= max_pages:
             break

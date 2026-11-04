@@ -41,3 +41,9 @@ def test_sections_spread_before_same_section_pages():
     usable = [cand(20, 0.9, "results"), cand(21, 0.85, "results"), cand(12, 0.7, "methods")]
     assert pages(ev.select(usable)) == [20, 21, 12]
     assert pages(ev.select(usable, diverse_ratio=0.6)) == [20, 12, 21]
+
+
+def test_sentence_about_another_study_is_not_shown_first():
+    other = Candidate(Sentence("D001", 4, 4, "Smith and others (2010) found the model accurate.", "results"), score=0.9)
+    own = Candidate(Sentence("D001", 6, 6, "The model was validated against 12 floods.", "results"), score=0.7)
+    assert pages(ev.select([other, own])) == [6, 4]
