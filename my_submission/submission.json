@@ -1,10 +1,10 @@
 {
   "submission_version": "apctt-submission-v3",
-  "team": "bartle",
+  "team": "JSON-Derulo",
   "package_id": "trl-evidence-module",
   "package_version": "0.1.0",
   "base_id": "apctt-base-9e7fe1324bb6",
-  "declared_package_sha256": "76e64da21074918550ce4c5f72ff52be46d2f4554d3fcce04f8f546a21d38c8d",
+  "declared_package_sha256": "9449ba753f3de677a200ef3af80db0dccf01d1ac5ad523f0958c156ec02991c5",
   "license": "MIT",
   "compute": {
     "device": "cpu"

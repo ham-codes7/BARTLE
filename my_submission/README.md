@@ -1,4 +1,4 @@
-# trl-evidence-module (team bartle)
+# Bartle: TRL assessment package (team JSON Derulo)
 
 TRL assessment package for the 2nd APCTT Hackathon 2026. CPU only, offline, deterministic.
 
