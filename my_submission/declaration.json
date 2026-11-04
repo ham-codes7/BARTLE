@@ -8,13 +8,13 @@
   "training": {
     "what": "assets/trl_model.json: cumulative logistic regressions P(TRL >= k) for k = 6 and 7 over 23 case-level features (best evidence score and cue count per criterion kind, target type); assets/trl_prior.json: smoothed TRL distribution per target type.",
     "code": "dev/train_trl.py and dev/build_prior.py in the team repository",
-    "configuration": "scikit-learn LogisticRegression, L2, C = 0.1, standardised features; add-0.5 smoothing for the prior",
+    "configuration": "scikit-learn LogisticRegression, L2, C = 0.1, standardised features; add-0.5 smoothing for the prior; trained on a full run of the public cases with the embedding stage complete (no time cap)",
     "data_sources_used": [
       "APCTT public sample cases"
     ],
     "seeds": "deterministic (no random initialisation); module seed 42",
     "hardware": "Apple M4 laptop, CPU only",
-    "validation": "leave-one-out over the 99 public cases (prior rebuilt without the held-out case): part-A proxy 0.778 prior only, 0.813 prior + evidence"
+    "validation": "leave-one-out over the 99 public cases (prior rebuilt without the held-out case): part-A proxy 0.778 prior only, 0.803 prior + evidence"
   },
   "data_sources": [
     {
